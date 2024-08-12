@@ -4,3 +4,5 @@ export interface IMessage {
     message: string;
     datetime: string;
 }
+
+export type MessageType = Omit<IMessage, 'id' | 'datetime'>;
