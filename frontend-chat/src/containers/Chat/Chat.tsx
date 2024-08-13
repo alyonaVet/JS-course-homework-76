@@ -17,17 +17,16 @@ const Chat = () => {
       const lastMessageDatetime = lastMessage ? `?datetime=${lastMessage.datetime}` : '';
       const url = `/messages${lastMessageDatetime}`;
 
-      const {data: newMessages} = await axiosApi.get<IMessage[] | null>(url);
+      const {data: newMessages} = await axiosApi.get<IMessage[]>(url);
 
-      if (newMessages && newMessages.length > 0) {
-        if (newMessages.length > 0) {
-          const latestFirstMessages = [...newMessages, ...messages].sort(
-            (a: IMessage, b: IMessage) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime()
-          );
-          setMessages(latestFirstMessages);
-          setLastMessage(latestFirstMessages[0]);
-        }
+      if (newMessages.length > 0) {
+        const latestFirstMessages = [...newMessages, ...messages].sort(
+          (a: IMessage, b: IMessage) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime()
+        );
+        setMessages(latestFirstMessages);
+        setLastMessage(latestFirstMessages[0]);
       }
+
     } catch (error) {
       console.error('Failed to get messages:', error);
     } finally {
@@ -35,32 +34,32 @@ const Chat = () => {
     }
   };
 
-    const createMessage = async (messageData: ApiMessage) => {
-      try {
-        await axiosApi.post('/messages', messageData);
-      } catch (error) {
-        console.error('Failed to send message:', error);
-      }
-    };
-
-    useEffect(() => {
-      void getMessages();
-    }, []);
-
-    useEffect(() => {
-      const interval = setInterval(getMessages, 3000);
-      return () => clearInterval(interval);
-    }, [lastMessage]);
-
-    return (
-      <Box component="main" my={3}>
-        <AddMessageForm onSubmit={createMessage}/>
-        <Messages messages={messages}/>
-        <Backdrop sx={{color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1}} open={preload}>
-          <CircularProgress color="inherit"/>
-        </Backdrop>
-      </Box>
-    );
+  const createMessage = async (messageData: ApiMessage) => {
+    try {
+      await axiosApi.post('/messages', messageData);
+    } catch (error) {
+      console.error('Failed to send message:', error);
+    }
   };
 
-  export default Chat;
+  useEffect(() => {
+    void getMessages();
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(getMessages, 3000);
+    return () => clearInterval(interval);
+  }, [lastMessage]);
+
+  return (
+    <Box component="main" my={3}>
+      <AddMessageForm onSubmit={createMessage}/>
+      <Messages messages={messages}/>
+      <Backdrop sx={{color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1}} open={preload}>
+        <CircularProgress color="inherit"/>
+      </Backdrop>
+    </Box>
+  );
+};
+
+export default Chat;
